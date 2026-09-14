@@ -14,7 +14,7 @@ Link to VGA Playground: https://vga-playground.com/?repo=https://github.com/baga
 
 ## 3D View
 
-Link to the 3D Viewer: https://gds-viewer.tinytapeout.com/?model=https://jinwoo0017.github.io/tt_um_vga_tictactoe/tinytapeout.oas&pdk=ihp-sg13g2
+Link to the 3D Viewer: https://gds-viewer.tinytapeout.com/?model=https://bagahu.github.io/tt_um_vga_tictactoe/tinytapeout.oas&pdk=ihp-sg13g2
 
 <img width="854" height="677" alt="image" src="https://github.com/user-attachments/assets/f3f695b1-0080-4b65-8485-697bf8ad8485" />
 
