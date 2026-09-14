@@ -4,7 +4,7 @@
 
 An FPGA‑based implementation of the classic Tic‑Tac‑Toe game with VGA output, designed for Tiny Tapeout.
 
-Link to VGA Playground: https://vga-playground.com/?repo=https://github.com/Jinwoo0017/tt_um_vga_tictactoe
+Link to VGA Playground: https://vga-playground.com/?repo=https://github.com/bagaHU/tt_um_vga_tictactoe
 
 <img width="278" height="269" alt="image" src="https://github.com/user-attachments/assets/f2a44560-0191-4484-a170-13ed9bf27018" />
 
