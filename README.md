@@ -1,8 +1,10 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
 
-# Tiny Tapeout Verilog Project Template
+# VGA Tic‑Tac‑Toe 🎮
 
-- [Read the documentation for project](docs/info.md)
+An FPGA‑based implementation of the classic Tic‑Tac‑Toe game with VGA output, designed for Tiny Tapeout.
+
+<img width="607" height="625" alt="image" src="https://github.com/user-attachments/assets/0d8b8c2c-6a74-4d3d-a792-6ce82d80a2ad" />
 
 ## What is Tiny Tapeout?
 
