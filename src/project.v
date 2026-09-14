@@ -38,7 +38,7 @@ module tt_um_vga_tictactoe (
      * ui_in[3] = LEFT
      * ui_in[4] = RIGHT
      * ui_in[5] = ATTACK  (place mark on selected cell)
-     * ui_in[7] = RESET
+     * ui_in[7] = NEW GAME
      */
 
     wire key_up     = ui_in[1];
@@ -46,7 +46,7 @@ module tt_um_vga_tictactoe (
     wire key_left   = ui_in[3];
     wire key_right  = ui_in[4];
     wire key_attack = ui_in[5];
-    wire key_reset  = ui_in[7];
+    wire key_reset  = ui_in[7]; // NEW GAME
 
     reg prev_up;
     reg prev_down;
@@ -522,7 +522,7 @@ module tt_um_vga_tictactoe (
 
     wire inside_ctrl_row2 =
         (hpos >= CTRL2_X) &&
-        (hpos < CTRL2_X + 18 * TEXT_CHAR_W) &&
+        (hpos < CTRL2_X + 21 * TEXT_CHAR_W) &&
         (vpos >= CTRL_Y2) &&
         (vpos < CTRL_Y2 + TEXT_CHAR_H);
 
@@ -615,7 +615,7 @@ module tt_um_vga_tictactoe (
      * CONTROL ROWS
      *
      * Row 1: "[1]UP [2]DOWN [3]LEFT [4]RIGHT"
-     * Row 2: "[5]ATTACK [7]RESET"
+     * Row 2: "[5]ATTACK [7]NEW GAME"
      */
 
     reg [7:0] ctrl_row1_char;
@@ -668,14 +668,18 @@ module tt_um_vga_tictactoe (
             6'd6:  ctrl_row2_char = "A";
             6'd7:  ctrl_row2_char = "C";
             6'd8:  ctrl_row2_char = "K";
+            6'd9:  ctrl_row2_char = " ";
             6'd10: ctrl_row2_char = "[";
             6'd11: ctrl_row2_char = "7";
             6'd12: ctrl_row2_char = "]";
-            6'd13: ctrl_row2_char = "R";
+            6'd13: ctrl_row2_char = "N";
             6'd14: ctrl_row2_char = "E";
-            6'd15: ctrl_row2_char = "S";
-            6'd16: ctrl_row2_char = "E";
-            6'd17: ctrl_row2_char = "T";
+            6'd15: ctrl_row2_char = "W";
+            6'd16: ctrl_row2_char = " ";
+            6'd17: ctrl_row2_char = "G";
+            6'd18: ctrl_row2_char = "A";
+            6'd19: ctrl_row2_char = "M";
+            6'd20: ctrl_row2_char = "E";
             default: ctrl_row2_char = " ";
         endcase
     end
@@ -937,6 +941,19 @@ module tt_um_vga_tictactoe (
                     endcase
                 end
 
+                "M": begin
+                    case (y)
+                        0: font_row = 5'b10001;
+                        1: font_row = 5'b11011;
+                        2: font_row = 5'b10101;
+                        3: font_row = 5'b10101;
+                        4: font_row = 5'b10001;
+                        5: font_row = 5'b10001;
+                        6: font_row = 5'b10001;
+                        default: font_row = 5'b00000;
+                    endcase
+                end
+
                 "X": begin
                     case (y)
                         0: font_row = 5'b10001;
@@ -1079,9 +1096,10 @@ module tt_um_vga_tictactoe (
     /*
      * VIDEO
      *
-     * BLUE:  winning-line border
-     * RED:   cursor selector
-     * WHITE: board grid lines, X / O marks, and all text
+     * BLUE:   selected-cell border during X's turn
+     * RED:    selected-cell border during O's turn
+     * GREEN:  winning-line border
+     * WHITE:  board grid lines, X / O marks, and all text
      */
 
     reg red;
@@ -1101,16 +1119,25 @@ module tt_um_vga_tictactoe (
                 if (win_border) begin
 
                     red   = 1'b0;
-                    green = 1'b0;
-                    blue  = 1'b1;
+                    green = 1'b1;
+                    blue  = 1'b0;
 
                 end
 
                 else if (selected_border) begin
 
-                    red   = 1'b1;
-                    green = 1'b0;
-                    blue  = 1'b0;
+                    if (!current_player) begin
+                        // X's turn: blue outline
+                        red   = 1'b0;
+                        green = 1'b0;
+                        blue  = 1'b1;
+                    end
+                    else begin
+                        // O's turn: red outline
+                        red   = 1'b1;
+                        green = 1'b0;
+                        blue  = 1'b0;
+                    end
 
                 end
 
