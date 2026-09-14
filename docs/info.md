@@ -9,12 +9,22 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-Explain how your project works
+The project implements a VGA Tic-Tac-Toe game using Verilog. It displays a 3×3 game board on a VGA screen, allowing two players to take turns placing X and O marks. The game detects winning combinations and displays the winner or a draw.
 
 ## How to test
 
-Explain how to use your project
+Connect the FPGA to a VGA display and keyboard, then program the FPGA with the project. Use the keyboard to control the cursor and play the game.
+
+Controls
+[1] UP
+[2] DOWN
+[3] LEFT
+[4] RIGHT
+[5] ATTACK / PLACE MARK
+[7] RESET
 
 ## External hardware
 
-List external hardware used in your project (e.g. PMOD, LED display, etc), if any
+- FPGA development board
+- VGA display
+- USB keyboard
