@@ -1,6 +1,6 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
 
-# VGA Tic‑Tac‑Toe 🎮
+# VGA Tic‑Tac‑Toe
 
 An FPGA‑based implementation of the classic Tic‑Tac‑Toe game with VGA output, designed for Tiny Tapeout.
 
