@@ -41,4 +41,4 @@ Link to the 3D Viewer: https://gds-viewer.tinytapeout.com/?model=https://jinwoo0
 |Flip Flops | [dfrbpq](https://raw.githubusercontent.com/IHP-GmbH/IHP-Open-PDK/refs/heads/main/ihp-sg13g2/libs.ref/sg13g2_stdcell/doc/sg13g2_stdcell_typ_1p20V_25C.pdf#0) | 57|
 |Inverter | [inv](https://raw.githubusercontent.com/IHP-GmbH/IHP-Open-PDK/refs/heads/main/ihp-sg13g2/libs.ref/sg13g2_stdcell/doc/sg13g2_stdcell_typ_1p20V_25C.pdf#23) | 37|
 |Multiplexer | [mux2](https://raw.githubusercontent.com/IHP-GmbH/IHP-Open-PDK/refs/heads/main/ihp-sg13g2/libs.ref/sg13g2_stdcell/doc/sg13g2_stdcell_typ_1p20V_25C.pdf#26) [mux4](https://raw.githubusercontent.com/IHP-GmbH/IHP-Open-PDK/refs/heads/main/ihp-sg13g2/libs.ref/sg13g2_stdcell/doc/sg13g2_stdcell_typ_1p20V_25C.pdf#27) | 9|
-## 1200 total cells (excluding fill and tap cells)
+### 1200 total cells (excluding fill and tap cells)
