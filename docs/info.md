@@ -11,7 +11,7 @@ You can also include images in this folder and reference them in the markdown. E
 
 The project implements a VGA Tic-Tac-Toe game using Verilog. It displays a 3×3 game board on a VGA screen, allowing two players to take turns placing X and O marks. The game detects winning combinations and displays the winner or a draw.
 
-Link to VGA Playground: https://vga-playground.com/?repo=https://github.com/Jinwoo0017/tt_um_vga_tictactoe
+Link to VGA Playground: https://vga-playground.com/?repo=https://github.com/bagaHU/tt_um_vga_tictactoe
 
 ## How to test
 
