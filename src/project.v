@@ -30,23 +30,14 @@ module tt_um_vga_tictactoe (
     assign uio_out = 8'b0;
     assign uio_oe  = 8'b0;
 
-    /*
-     * CONTROLS
-     *
-     * ui_in[1] = UP
-     * ui_in[2] = DOWN
-     * ui_in[3] = LEFT
-     * ui_in[4] = RIGHT
-     * ui_in[5] = ATTACK  (place mark on selected cell)
-     * ui_in[7] = NEW GAME
-     */
+    // Controls
 
     wire key_up     = ui_in[1];
     wire key_down   = ui_in[2];
     wire key_left   = ui_in[3];
     wire key_right  = ui_in[4];
     wire key_attack = ui_in[5];
-    wire key_reset  = ui_in[7]; // NEW GAME
+    wire key_reset  = ui_in[7];
 
     reg prev_up;
     reg prev_down;
@@ -62,13 +53,7 @@ module tt_um_vga_tictactoe (
     wire attack_press = key_attack ^ prev_attack;
     wire reset_press  = key_reset  ^ prev_reset;
 
-    /*
-     * BOARD STATE
-     *
-     * Two 9-bit masks, one per player. Bit i corresponds to cell
-     * i (row*3 + col). A cell is empty when neither mask has
-     * that bit set.
-     */
+    // Board state
 
     reg [1:0] cursor_row;
     reg [1:0] cursor_col;
@@ -76,15 +61,8 @@ module tt_um_vga_tictactoe (
     reg [8:0] x_mask;
     reg [8:0] o_mask;
 
-    reg current_player;   // 0 = X, 1 = O
-    reg winner;            // valid only while game_state == S_WON
-
-    /*
-     * Which of the 8 lines won - NOT which 9 cells. Row/col/diag
-     * membership and border shape are both cheap to derive from
-     * a single 3-bit line index, so there is no need to keep a
-     * full 9-bit cell mask around just for rendering.
-     */
+    reg current_player;
+    reg winner;
 
     reg [2:0] win_line_index;
 
@@ -93,12 +71,6 @@ module tt_um_vga_tictactoe (
     localparam S_DRAW    = 2'd2;
 
     reg [1:0] game_state;
-
-    /*
-     * ROW OFFSET
-     *
-     * Cheap 3x3 index helper: row*3 without a multiplier.
-     */
 
     function [3:0] row_off;
         input [1:0] r;
@@ -133,25 +105,16 @@ module tt_um_vga_tictactoe (
     wire board_full_next =
         (next_x_mask | next_o_mask) == 9'b111111111;
 
-    /*
-     * WIN LINES
-     *
-     * Same "scan and take the first match" idea as the K-map
-     * solver's uncovered-cell scan, just over 8 fixed patterns
-     * instead of 81 candidates. This part still needs the full
-     * 9-bit patterns, because actually detecting a win requires
-     * checking real board coverage - the simplification below
-     * only applies to how the winning line gets DRAWN.
-     */
+    // Winning lines
 
-    localparam [8:0] LINE0 = 9'b000000111; // row 0
-    localparam [8:0] LINE1 = 9'b000111000; // row 1
-    localparam [8:0] LINE2 = 9'b111000000; // row 2
-    localparam [8:0] LINE3 = 9'b001001001; // col 0
-    localparam [8:0] LINE4 = 9'b010010010; // col 1
-    localparam [8:0] LINE5 = 9'b100100100; // col 2
-    localparam [8:0] LINE6 = 9'b100010001; // diagonal \
-    localparam [8:0] LINE7 = 9'b001010100; // diagonal /
+    localparam [8:0] LINE0 = 9'b000000111;
+    localparam [8:0] LINE1 = 9'b000111000;
+    localparam [8:0] LINE2 = 9'b111000000;
+    localparam [8:0] LINE3 = 9'b001001001;
+    localparam [8:0] LINE4 = 9'b010010010;
+    localparam [8:0] LINE5 = 9'b100100100;
+    localparam [8:0] LINE6 = 9'b100010001;
+    localparam [8:0] LINE7 = 9'b001010100;
 
     function [8:0] line_mask;
         input [2:0] idx;
@@ -175,32 +138,24 @@ module tt_um_vga_tictactoe (
     integer li;
 
     always @(*) begin
-
         win_found = 1'b0;
         matched_line_index = 3'd0;
 
         for (li = 0; li < 8; li = li + 1) begin
-
             test_line = line_mask(li[2:0]);
 
             if (!win_found &&
                 ((current_next_mask & test_line) == test_line)) begin
-
                 win_found = 1'b1;
                 matched_line_index = li[2:0];
-
             end
         end
     end
 
-    /*
-     * MAIN GAME LOGIC
-     */
+    // Main game logic
 
     always @(posedge clk) begin
-
         if (!rst_n) begin
-
             cursor_row <= 2'd0;
             cursor_col <= 2'd0;
 
@@ -220,11 +175,8 @@ module tt_um_vga_tictactoe (
             prev_right  <= 1'b0;
             prev_attack <= 1'b0;
             prev_reset  <= 1'b0;
-
         end
-
         else begin
-
             prev_up     <= key_up;
             prev_down   <= key_down;
             prev_left   <= key_left;
@@ -233,7 +185,6 @@ module tt_um_vga_tictactoe (
             prev_reset  <= key_reset;
 
             if (reset_press) begin
-
                 cursor_row <= 2'd0;
                 cursor_col <= 2'd0;
 
@@ -246,89 +197,59 @@ module tt_um_vga_tictactoe (
                 win_line_index <= 3'd0;
 
                 game_state <= S_PLAYING;
-
             end
-
-            /*
-             * Movement and placing are only live while the game
-             * is still being played - the board freezes once
-             * someone wins or it fills up, same idea as the
-             * K-map file freezing the cursor once simplify_mode
-             * kicked in.
-             */
-
             else if (game_state == S_PLAYING) begin
-
                 if (up_press) begin
-
                     if (cursor_row == 2'd0)
                         cursor_row <= 2'd2;
                     else
                         cursor_row <= cursor_row - 2'd1;
-
                 end
 
                 if (down_press) begin
-
                     if (cursor_row == 2'd2)
                         cursor_row <= 2'd0;
                     else
                         cursor_row <= cursor_row + 2'd1;
-
                 end
 
                 if (left_press) begin
-
                     if (cursor_col == 2'd0)
                         cursor_col <= 2'd2;
                     else
                         cursor_col <= cursor_col - 2'd1;
-
                 end
 
                 if (right_press) begin
-
                     if (cursor_col == 2'd2)
                         cursor_col <= 2'd0;
                     else
                         cursor_col <= cursor_col + 2'd1;
-
                 end
 
                 if (place_now) begin
-
                     if (!current_player)
                         x_mask <= next_x_mask;
                     else
                         o_mask <= next_o_mask;
 
                     if (win_found) begin
-
                         game_state <= S_WON;
                         winner <= current_player;
                         win_line_index <= matched_line_index;
-
                     end
-
                     else if (board_full_next) begin
-
                         game_state <= S_DRAW;
-
                     end
-
                     else begin
-
                         current_player <= ~current_player;
-
                     end
                 end
             end
         end
     end
 
-    /*
-     * GRID GEOMETRY (3x3)
-     */
+    // Grid geometry
 
     localparam GRID_X = 185;
     localparam GRID_Y = 115;
@@ -379,16 +300,10 @@ module tt_um_vga_tictactoe (
         (tile_row == cursor_row) &&
         (tile_col == cursor_col);
 
-    /*
-     * MARK RENDERING (big X / O glyph inside the tile)
-     *
-     * Reuses the same font_row glyph table as the text below,
-     * just rendered at a much larger scale (8px per font pixel
-     * instead of 2px) so it fills most of a 90x90 tile.
-     */
+    // Mark rendering
 
-    localparam SYM_MARGIN_X = 25; // (90 - 5*8) / 2
-    localparam SYM_MARGIN_Y = 17; // (90 - 7*8) / 2
+    localparam SYM_MARGIN_X = 25;
+    localparam SYM_MARGIN_Y = 17;
 
     wire in_sym_x =
         (tile_x >= SYM_MARGIN_X) &&
@@ -403,12 +318,7 @@ module tt_um_vga_tictactoe (
 
     wire [7:0] sym_char = display_has_x ? "X" : "O";
 
-    /*
-     * TILE EDGE GEOMETRY
-     *
-     * Shared by the grid lines, the cursor selector, and the
-     * win-line border below.
-     */
+    // Tile edges
 
     wire edge_top    = tile_y < BORDER;
     wire edge_bottom = tile_y >= TILE_H - BORDER;
@@ -423,43 +333,16 @@ module tt_um_vga_tictactoe (
     wire boundary_left   = (tile_col == 2'd0);
     wire boundary_right  = (tile_col == 2'd2);
 
-    /*
-     * ALWAYS-VISIBLE BOARD GRID
-     *
-     * Every cell's own border is drawn all the time, which is
-     * what actually makes the 3x3 board visible - previously
-     * only the cursor box and the win box were drawn, so an
-     * unselected, unwon board rendered as blank space.
-     */
-
     wire normal_grid = edge_active;
 
-    /*
-     * WIN-LINE BORDER
-     *
-     * Only 8 possible winning lines exist, and they fall into
-     * 3 shapes:
-     *
-     *   ROW  (index 0-2): highlight top+bottom of every cell in
-     *        the row, and only the outer left/right ends.
-     *
-     *   COL  (index 3-5): mirror of the above.
-     *
-     *   DIAG (index 6-7): the three cells only ever touch at a
-     *        corner, never share an edge, so there is no
-     *        "neighbor" to check - every edge of every cell in
-     *        the diagonal gets highlighted.
-     *
-     * This replaces a generic per-pixel neighbor lookup (which
-     * needed a computed row/col, a boundary check, and an
-     * indexed read into a 9-bit mask) with a handful of direct
-     * comparisons against the single stored line index.
-     */
+    // Winning line
 
     wire is_row_win = (win_line_index <= 3'd2);
-    wire is_col_win = (win_line_index >= 3'd3) && (win_line_index <= 3'd5);
+    wire is_col_win = (win_line_index >= 3'd3) &&
+                      (win_line_index <= 3'd5);
 
-    wire [2:0] rc_sum = {1'b0, tile_row} + {1'b0, tile_col};
+    wire [2:0] rc_sum =
+        {1'b0, tile_row} + {1'b0, tile_col};
 
     wire cell_in_win =
         is_row_win ? (tile_row == win_line_index[1:0]) :
@@ -470,31 +353,24 @@ module tt_um_vga_tictactoe (
     wire win_border =
         (game_state == S_WON) &&
         cell_in_win &&
-        ( is_row_win ? (edge_top || edge_bottom ||
-                        (boundary_left && edge_left) ||
-                        (boundary_right && edge_right)) :
-          is_col_win ? (edge_left || edge_right ||
-                        (boundary_top && edge_top) ||
-                        (boundary_bottom && edge_bottom)) :
-                       edge_active );
+        (is_row_win ?
+            (edge_top || edge_bottom ||
+             (boundary_left && edge_left) ||
+             (boundary_right && edge_right)) :
+         is_col_win ?
+            (edge_left || edge_right ||
+             (boundary_top && edge_top) ||
+             (boundary_bottom && edge_bottom)) :
+            edge_active);
 
-    /*
-     * RED SELECTOR (cursor)
-     */
+    // Cursor
 
     wire selected_border =
         (game_state == S_PLAYING) &&
         selected_tile &&
         edge_active;
 
-    /*
-     * TEXT SYSTEM
-     *
-     * Same character-cell approach as the example file's font
-     * renderer, trimmed down to only the glyphs this game
-     * actually uses: A C D E F G H I K L N O P R S T U W X,
-     * digits 1 2 3 4 5 7, and [ ].
-     */
+    // Text
 
     localparam TEXT_CHAR_W = 12;
     localparam TEXT_CHAR_H = 14;
@@ -533,7 +409,6 @@ module tt_um_vga_tictactoe (
     reg [9:0] text_local_y;
 
     always @(*) begin
-
         text_local_x = 10'd0;
         text_local_y = 10'd0;
 
@@ -552,24 +427,16 @@ module tt_um_vga_tictactoe (
     end
 
     wire [5:0] char_pos = text_local_x / TEXT_CHAR_W;
-    wire [3:0] font_y   = text_local_y[3:1]; // /2, TEXT_SCALE is a power of 2
+    wire [3:0] font_y   = text_local_y[3:1];
 
-    /*
-     * TURN / RESULT LABEL
-     *
-     * "[X] TURN"  while playing
-     * "[O] WINS"  once a player wins
-     * "  DRAW  "  if the board fills with no winner
-     */
+    // Result label
 
     reg [7:0] label_char;
 
     always @(*) begin
-
         label_char = " ";
 
         case (game_state)
-
             S_PLAYING: begin
                 case (char_pos)
                     6'd0: label_char = "[";
@@ -598,7 +465,7 @@ module tt_um_vga_tictactoe (
                 endcase
             end
 
-            default: begin // S_DRAW
+            default: begin
                 case (char_pos)
                     6'd2: label_char = "D";
                     6'd3: label_char = "R";
@@ -607,21 +474,14 @@ module tt_um_vga_tictactoe (
                     default: label_char = " ";
                 endcase
             end
-
         endcase
     end
 
-    /*
-     * CONTROL ROWS
-     *
-     * Row 1: "[1]UP [2]DOWN [3]LEFT [4]RIGHT"
-     * Row 2: "[5]ATTACK [7]NEW GAME"
-     */
+    // Control rows
 
     reg [7:0] ctrl_row1_char;
 
     always @(*) begin
-
         case (char_pos)
             6'd0:  ctrl_row1_char = "[";
             6'd1:  ctrl_row1_char = "1";
@@ -657,7 +517,6 @@ module tt_um_vga_tictactoe (
     reg [7:0] ctrl_row2_char;
 
     always @(*) begin
-
         case (char_pos)
             6'd0:  ctrl_row2_char = "[";
             6'd1:  ctrl_row2_char = "5";
@@ -690,23 +549,16 @@ module tt_um_vga_tictactoe (
         inside_ctrl_row2 ? ctrl_row2_char :
                            8'h20;
 
-    /*
-     * FONT
-     *
-     * Trimmed to only the glyphs this design uses: A C D E F G
-     * H I K L N O P R S T U W X, digits 1 2 3 4 5 7, and [ ].
-     */
+    // Font
 
     function [4:0] font_row;
         input [7:0] ch;
         input [3:0] y;
 
         begin
-
             font_row = 5'b00000;
 
             case (ch)
-
                 "A": begin
                     case (y)
                         0: font_row = 5'b01110;
@@ -1073,9 +925,7 @@ module tt_um_vga_tictactoe (
 
                 default:
                     font_row = 5'b00000;
-
             endcase
-
         end
     endfunction
 
@@ -1093,84 +943,56 @@ module tt_um_vga_tictactoe (
         ((text_local_x % TEXT_CHAR_W) < 10) &&
         text_font_bits[4 - ((text_local_x % TEXT_CHAR_W) >> 1)];
 
-    /*
-     * VIDEO
-     *
-     * BLUE:   selected-cell border during X's turn
-     * RED:    selected-cell border during O's turn
-     * GREEN:  winning-line border
-     * WHITE:  board grid lines, X / O marks, and all text
-     */
+    // Video
 
     reg red;
     reg green;
     reg blue;
 
     always @(*) begin
-
         red   = 1'b0;
         green = 1'b0;
         blue  = 1'b0;
 
         if (display_on) begin
-
             if (inside_grid) begin
-
                 if (win_border) begin
-
                     red   = 1'b0;
                     green = 1'b1;
                     blue  = 1'b0;
-
                 end
-
                 else if (selected_border) begin
-
                     if (!current_player) begin
-                        // X's turn: blue outline
                         red   = 1'b0;
                         green = 1'b0;
                         blue  = 1'b1;
                     end
                     else begin
-                        // O's turn: red outline
                         red   = 1'b1;
                         green = 1'b0;
                         blue  = 1'b0;
                     end
-
                 end
-
                 else if (normal_grid) begin
-
                     red   = 1'b1;
                     green = 1'b1;
                     blue  = 1'b1;
-
                 end
-
                 else if (sym_pixel) begin
-
                     red   = 1'b1;
                     green = 1'b1;
                     blue  = 1'b1;
-
                 end
             end
-
             else if (inside_text_any && text_font_pixel) begin
-
                 red   = 1'b1;
                 green = 1'b1;
                 blue  = 1'b1;
-
             end
         end
     end
 
-    /*
-     * VGA OUTPUT
-     */
+    // VGA output
 
     assign uo_out[7] = hsync;
     assign uo_out[3] = vsync;
