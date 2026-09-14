@@ -4,7 +4,7 @@
 
 An FPGA‑based implementation of the classic Tic‑Tac‑Toe game with VGA output, designed for Tiny Tapeout.
 
-<img width="440" height="269" alt="image" src="https://github.com/user-attachments/assets/e01d0a4d-c333-41b4-b811-e61828eff5aa" />
+<img width="540" height="269" alt="image" src="https://github.com/user-attachments/assets/e01d0a4d-c333-41b4-b811-e61828eff5aa" />
 
 ## What is Tiny Tapeout?
 
