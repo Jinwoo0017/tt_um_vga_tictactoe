@@ -20,15 +20,13 @@ Link to the 3D Viewer: https://gds-viewer.tinytapeout.com/?model=https://jinwoo0
 
 ## Stats 
 
-<img width="943" height="550" alt="image" src="https://github.com/user-attachments/assets/cef53033-0e08-448b-85c6-2a8d1baa33ac" />
-
-# Routing stats
+### Routing stats
 
 | Utilisation (%) | Wire length (um) |
 |-------------|------------------|
 | 51.204 % | 33733 |
 
-# Cell usage by Category
+### Cell usage by Category
 
 | Category | Cells | Count |
 |---------------|----------|-------|
