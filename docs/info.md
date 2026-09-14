@@ -23,7 +23,7 @@ Controls
 [3] LEFT
 [4] RIGHT
 [5] ATTACK / PLACE MARK
-[7] RESET
+[7] NEW GAME
 
 
 ## External hardware
